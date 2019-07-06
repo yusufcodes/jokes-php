@@ -14,7 +14,7 @@ function getJoke($pdo, $id)
     return $query->fetch();
 }
 
-/* ** insertJokes **
+/* ** insertJoke **
 // Purpose:
 Allows for a joke to be added to the database
 // Parameters:
@@ -29,6 +29,25 @@ function insertJoke($pdo, $joketext, $authorId)
     ':joketext' => $joketext,
     ':authorId' => $authorId];
     query($pdo, $query, $parameters);
+}
+
+/* ** updateJoke **
+// Purpose:
+Allows for an existing joke to be updated
+// Parameters:
+$pdo: PDO object to interact with the database
+$jokeId: The ID of the joke to be edited
+$joketext: The new joke text to be added
+$authorId: The new joke author id to be added
+*/
+function updateJoke($pdo, $jokeId, $joketext, $authorId)
+{
+    $parameters = [
+        ':joketext' => $joketext,
+        ':authorId' => $authorId,
+        ':id' => $jokeId];
+    
+    query($pdo, 'UPDATE `joke` SET `authorId` = :authorId, `joketext` = :joketext WHERE `id` = :id', $parameters);
 }
 
 // Method to run an SQL query, given a PDO object and SQL query
