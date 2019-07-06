@@ -3,9 +3,7 @@ if (isset($_POST['joketext']))
 {
     try
     {
-        // Connect to the database and perform an INSERT operation
         include __DIR__.'/../includes/DatabaseConnection.php';
-
         include __DIR__.'/../includes/DatabaseFunctions.php';
 
         insertJoke($pdo, $_POST['joketext'], 1);
