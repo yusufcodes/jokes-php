@@ -6,18 +6,9 @@ if (isset($_POST['joketext']))
         // Connect to the database and perform an INSERT operation
         include __DIR__.'/../includes/DatabaseConnection.php';
 
-        // SQL Query with placeholders - Prepared Statement
-        // Use prepare method on SQL query
-        // :joketext = placeholder, refer to this in the bindValue method after prepare method
-        // CURDATE(): Built in SQL method to get the current date
-        $sql = 
-        'INSERT INTO `joke`
-        SET `joketext` = :joketext,
-        `jokedate` = CURDATE()';
+        include __DIR__.'/../includes/DatabaseFunctions.php';
 
-        $stmt = $pdo->prepare($sql); // RETURN: PDOStatement object
-        $stmt->bindValue(':joketext', $_POST['joketext']);
-        $stmt->execute();
+        insertJoke($pdo, $_POST['joketext'], 1);
 
         header('location: jokes.php');
     }
