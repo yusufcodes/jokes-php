@@ -6,30 +6,29 @@ function totalJokes($pdo)
     return $row[0];
 }
 
-/*
-function getJoke($pdo, $id)
-{
-    $query = $pdo->prepare('SELECT FROM `joke` WHERE `id` = :id');
-    $query->bindValue(':id', $id);
-    $query->execute();
-    return $query->fetch();
-}
-
-function getJokeNew($pdo, $id)
-{
-    $sql = 'SELECT FROM `joke` WHERE `id` = '.$id;
-    $query = query($pdo, $sql);
-    return $query->fetch();
-}
-*/
-
 function getJoke($pdo, $id)
 {
     // Array, $parameters, to be used in the query function
     $parameters = [':id' => $id];
     $query = query($pdo, 'SELECT * FROM `joke` WHERE `id` = :id', $parameters);
     return $query->fetch();
+}
 
+/* ** insertJokes **
+// Purpose:
+Allows for a joke to be added to the database
+// Parameters:
+$pdo: PDO object to interact with the database
+$joketext: The joke to be added to the database
+$authorId: The ID of the author who wrote the joke
+*/
+function insertJoke($pdo, $joketext, $authorId)
+{
+    $query = 'INSERT INTO `joke` VALUES (:joketext, CURDATE(), :authorId)';
+    $parameters = [
+    ':joketext' => $joketext,
+    ':authorId' => $authorId];
+    query($pdo, $query, $parameters);
 }
 
 // Method to run an SQL query, given a PDO object and SQL query
@@ -59,15 +58,4 @@ function query($pdo, $sql, $parameters = [])
 
     return $query;
 }
-
-/*
-function totalJokes($pdo)
-{
-    $query = $pdo->prepare('SELECT COUNT(*) FROM `joke`');
-    $query->execute();
-    $row = $query->fetch();
-    return $row[0];
-}
-*/
-
 ?>
