@@ -7,13 +7,7 @@ try
     // Including the files allowing for functions querying the database to be accessed 
     include_once __DIR__.'/../includes/DatabaseFunctions.php';
 
-    /* *** SELECT *** */
-    $sql = 'SELECT `joke`.`id`, `joketext`, `name`, `email`
-    FROM `joke`
-    INNER JOIN `author`
-    ON `authorid` = `author`.`id`';
-
-    $jokes = $pdo->query($sql);
+    $jokes = allJokes($pdo);
 
     // Dynamically setting the title of the jokes page
     $title = 'Joke list';
