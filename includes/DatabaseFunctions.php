@@ -27,6 +27,20 @@ function totalJokes($pdo)
     return $row[0];
 }
 
+function total($pdo, $table)
+{
+    $query = query($pdo, 'SELECT COUNT(*) FROM `'.$table.'`');
+    $row = $query->fetch();
+    return $row[0];
+}
+
+// findAll: Generic method to retrieve all the records of a specified table
+function findAll($pdo, $table)
+{
+    $result = query($pdo, 'SELECT * FROM `' . $table . '`');
+    return $result->fetchAll();
+}
+
 /* **getJoke**
 // Purpose:
 Allows for a specific joke to be selected from the database based on ID
@@ -39,6 +53,19 @@ function getJoke($pdo, $id)
     // Array, $parameters, to be used in the query function
     $parameters = [':id' => $id];
     $query = query($pdo, 'SELECT * FROM `joke` WHERE `id` = :id', $parameters);
+    return $query->fetch();
+}
+
+function findById($pdo, $table, $primaryKey, $value)
+{
+    $query = 'SELECT * FROM `' . $table . '` WHERE `' . $primaryKey .'` =  :value';
+
+    $parameters = [
+        'value' => $value
+    ];
+
+    $query = query($pdo, $query, $parameters);
+
     return $query->fetch();
 }
 
@@ -60,9 +87,9 @@ function insertJoke($pdo, $joketext, $authorId)
     query($pdo, $query, $parameters);
 }*/
 
-function insertJoke($pdo, $fields)
+function insert($pdo, $table, $fields)
 {
-    $query = 'INSERT INTO `joke` (';
+    $query = 'INSERT INTO `' . $table . '` (';
 
     foreach ($fields as $key => $value)
     {
@@ -111,9 +138,9 @@ function updateJoke($pdo, $jokeId, $joketext, $authorId)
 $pdo: PDO object to interact with the database
 $fields: An array containing the fields that will be updated
 */
-function updateJoke($pdo, $fields)
+function update($pdo, $table, $primaryKey, $fields)
 {
-    $query = 'UPDATE `joke` SET ';
+    $query = 'UPDATE `' . $table . '` SET ';
 
     foreach($fields as $key => $value)
     {
@@ -122,7 +149,7 @@ function updateJoke($pdo, $fields)
 
     $query = rtrim($query, ',');
 
-    $query .= ' WHERE `id` = :primaryKey';
+    $query .= ' WHERE `' . $primaryKey . '` = :primaryKey';
 
     $fields['primaryKey'] = $fields['id'];
 
@@ -138,10 +165,10 @@ Allows for a joke from the database to be deleted based on its ID
 $pdo: PDO object to interact with the database
 $id: ID of the joke to be deleted
 */
-function deleteJoke($pdo, $id)
+function delete($pdo, $table, $primaryKey, $id)
 {
     $parameters = [':id' => $id];
-    query($pdo, 'DELETE FROM `joke` WHERE `id` = :id', $parameters);
+    query($pdo, 'DELETE FROM `' .$table. '` WHERE `' .$primaryKey. '` = :id', $parameters);
 }
 
 /* **allJokes**
