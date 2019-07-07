@@ -8,7 +8,7 @@ try
     {
         //updateJoke($pdo, $_POST['jokeid'], $_POST['joketext'], 1);
 
-        update($pdo, 'joke', [
+        update($pdo, 'joke', 'id', [
             'id' => $_POST['jokeid'],
             'joketext' => $_POST['joketext'],
             'authorId' => 1

@@ -10,7 +10,7 @@ try
 
     foreach($result as $joke)
     {
-        $author = findById($pdo, 'author', 'id', $joke[authorId]);
+        $author = findById($pdo, 'author', 'id', $joke['authorid']);
 
         $jokes[] = [
             'id' => $joke['id'],
