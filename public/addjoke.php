@@ -8,7 +8,7 @@ if (isset($_POST['joketext']))
 
         //insertJoke($pdo, $_POST['joketext'], 1);
 
-        insertJoke($pdo, ['authorId' => 1,
+        insert($pdo, 'joke' ['authorId' => 1,
         'joketext' => $_POST['joketext'],
         'jokedate' => new DateTime()
         ]);

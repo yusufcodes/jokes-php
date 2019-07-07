@@ -4,7 +4,22 @@ try
     include_once __DIR__.'/../includes/DatabaseConnection.php';
     include_once __DIR__.'/../includes/DatabaseFunctions.php';
 
-    $jokes = allJokes($pdo);
+    $result = findAll($pdo, 'joke');
+
+    $jokes = [];
+
+    foreach($result as $joke)
+    {
+        $author = findById($pdo, 'author', 'id', $joke[authorId]);
+
+        $jokes[] = [
+            'id' => $joke['id'],
+            'joketext' => $joke['joketext'],
+            'jokedate' => $joke['jokedate'],
+            'name' => $author['name'],
+            'email' => $author['email']
+        ];
+    }
 
     // Dynamically setting the title of the jokes page
     $title = 'Joke list';

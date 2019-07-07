@@ -8,7 +8,7 @@ try
     {
         //updateJoke($pdo, $_POST['jokeid'], $_POST['joketext'], 1);
 
-        updateJoke($pdo, [
+        update($pdo, 'joke', [
             'id' => $_POST['jokeid'],
             'joketext' => $_POST['joketext'],
             'authorId' => 1
@@ -19,7 +19,7 @@ try
 
     else
     {
-        $joke = getJoke($pdo, $_GET['id']);
+        $joke = findById($pdo, 'joke', 'id', $_GET['id']);
         $title = 'Edit joke';
         ob_start();
         include __DIR__.'/../templates/editjoke.html.php';
