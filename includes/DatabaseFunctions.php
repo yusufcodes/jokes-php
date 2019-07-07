@@ -1,6 +1,19 @@
 <?php
 // DatabaseFunctions.php: Functions created to query the ijdb database
 
+function processDates($fields)
+{
+    foreach ($fields as $key => $value)
+    {
+        if ($value instanceof DateTime)
+        {
+            $fields[$key] = $value->format('Y-m-d');
+        }
+    }
+
+    return $fields;
+}
+
 /* **totalJokes**
 // Purpose:
 Allows for the number of jokes stored in the database to be retrieved
@@ -37,6 +50,7 @@ $pdo: PDO object to interact with the database
 $joketext: The joke to be added to the database
 $authorId: The ID of the author who wrote the joke
 */
+/*
 function insertJoke($pdo, $joketext, $authorId)
 {
     $query = 'INSERT INTO `joke` VALUES (:joketext, CURDATE(), :authorId)';
@@ -44,8 +58,34 @@ function insertJoke($pdo, $joketext, $authorId)
     ':joketext' => $joketext,
     ':authorId' => $authorId];
     query($pdo, $query, $parameters);
-}
+}*/
 
+function insertJoke($pdo, $fields)
+{
+    $query = 'INSERT INTO `joke` (';
+
+    foreach ($fields as $key => $value)
+    {
+        $query .= '`' . $key . '`,';
+    }
+
+    $query = rtrim($query, ',');
+
+    $query .= ') VALUES (';
+
+    foreach ($fields as $key => $value)
+    {
+        $query .= ':' . $key . ',';
+    }
+
+    $query = rtrim($query, ',');
+
+    $query .= ')';
+
+    $fields = processDates($fields);
+
+    query($pdo, $query, $fields);
+}
 /* ** updateJoke **
 // Purpose:
 Allows for an existing joke to be updated
@@ -55,6 +95,7 @@ $jokeId: The ID of the joke to be edited
 $joketext: The new joke text to be added
 $authorId: The new joke author id to be added
 */
+/*
 function updateJoke($pdo, $jokeId, $joketext, $authorId)
 {
     $parameters = [
@@ -63,6 +104,31 @@ function updateJoke($pdo, $jokeId, $joketext, $authorId)
         ':id' => $jokeId];
     
     query($pdo, 'UPDATE `joke` SET `authorId` = :authorId, `joketext` = :joketext WHERE `id` = :id', $parameters);
+}
+*/
+
+/*
+$pdo: PDO object to interact with the database
+$fields: An array containing the fields that will be updated
+*/
+function updateJoke($pdo, $fields)
+{
+    $query = 'UPDATE `joke` SET ';
+
+    foreach($fields as $key => $value)
+    {
+        $query .= '`' . $key . '` = :'.$key . ',';
+    }
+
+    $query = rtrim($query, ',');
+
+    $query .= ' WHERE `id` = :primaryKey';
+
+    $fields['primaryKey'] = $fields['id'];
+
+    $fields = processDates($fields);
+
+    query($pdo, $query, $fields);
 }
 
 /* **deleteJoke**
@@ -94,7 +160,7 @@ function allJokes($pdo)
 }
 /* **query**
 // Purpose:
-/* Method to run an SQL query, given a PDO object and SQL query and optionally, an array
+Method to run an SQL query, given a PDO object and SQL query and optionally, an array
 of parameters. 
 // Parameters:
 $pdo: PDO object to interact with the database
