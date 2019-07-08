@@ -3,6 +3,7 @@ try {
     include __DIR__.'/../includes/DatabaseConnection.php';
     include __DIR__.'/../includes/DatabaseFunctions.php';
 
+    // Execute the delete method with the ID retrieved from the form submitted
     delete($pdo, 'joke', 'id', $_POST['id']);
 
     // redirect

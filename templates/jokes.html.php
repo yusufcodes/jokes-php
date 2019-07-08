@@ -17,17 +17,14 @@
         <p>
         <?=htmlspecialchars($joke['joketext'], ENT_QUOTES, 'UTF-8'); ?>
         <a href=""></a>
-        (by <a href="mailto:<?php
-echo htmlspecialchars($joke['email'], ENT_QUOTES,
-        'UTF-8'); ?>"><?php
-    echo htmlspecialchars($joke['name'], ENT_QUOTES,
-        'UTF-8'); ?></a> on
+        (by
+        <a href="mailto:<?php echo htmlspecialchars($joke['email'], ENT_QUOTES,
+        'UTF-8'); ?>"><?php echo htmlspecialchars($joke['name'], ENT_QUOTES,'UTF-8'); ?></a>
+        on
         <?php
         $date = new DateTime($joke['jokedate']);
         echo $date->format('jS F Y');
-        ?>
-        
-        )
+        ?>)</p>
 
         <a href="editjoke.php?id=<?=$joke['id']?>">Edit</a>
         
@@ -35,13 +32,8 @@ echo htmlspecialchars($joke['email'], ENT_QUOTES,
             <input type="hidden" name="id" value="<?=$joke['id']?>">
             <input type="submit" value="Delete">
         </form>
-
-        
-        
     </blockquote>
-    
     <?php endforeach; ?>
     <?php endif; ?>
-
 </body>
 </html>

@@ -1,32 +1,10 @@
 <?php
 // DatabaseFunctions.php: Functions created to query the ijdb database
 
-function processDates($fields)
-{
-    foreach ($fields as $key => $value)
-    {
-        if ($value instanceof DateTime)
-        {
-            $fields[$key] = $value->format('Y-m-d');
-        }
-    }
-
-    return $fields;
-}
-
-/* **totalJokes**
-// Purpose:
-Allows for the number of jokes stored in the database to be retrieved
-// Parameters:
-$pdo: PDO object to interact with the database
+/* total: Retrieve the total number of records from a database
+$pdo: The PDO object to interact with the database
+$table: The table of which total number of records are to be selected from
 */
-function totalJokes($pdo)
-{
-    $query = query($pdo, 'SELECT COUNT(*) FROM `joke`');
-    $row = $query->fetch();
-    return $row[0];
-}
-
 function total($pdo, $table)
 {
     $query = query($pdo, 'SELECT COUNT(*) FROM `'.$table.'`');
@@ -34,28 +12,23 @@ function total($pdo, $table)
     return $row[0];
 }
 
-// findAll: Generic method to retrieve all the records of a specified table
+/* findAll: Generic method to retrieve all the records of a specified table
+$pdo: The PDO object to interact with the database
+$table: The table of which all records are to be selected from
+*/
 function findAll($pdo, $table)
 {
     $result = query($pdo, 'SELECT * FROM `' . $table . '`');
     return $result->fetchAll();
 }
 
-/* **getJoke**
-// Purpose:
-Allows for a specific joke to be selected from the database based on ID
-// Parameters:
-$pdo: PDO object to interact with the database
-$id: ID of the joke to be retrieved from the database
+/* findById: Retrieve a database record based on its identifier
+$pdo: The PDO object to interact with the database
+$table: The table for the search to be carried out on
+$primaryKey: The PK identifier for specified table.
+$value: The ID to be selected from the db
+return: none
 */
-function getJoke($pdo, $id)
-{
-    // Array, $parameters, to be used in the query function
-    $parameters = [':id' => $id];
-    $query = query($pdo, 'SELECT * FROM `joke` WHERE `id` = :id', $parameters);
-    return $query->fetch();
-}
-
 function findById($pdo, $table, $primaryKey, $value)
 {
     $query = 'SELECT * FROM `' . $table . '` WHERE `' . $primaryKey .'` =  :value';
@@ -69,42 +42,37 @@ function findById($pdo, $table, $primaryKey, $value)
     return $query->fetch();
 }
 
-/* ** insertJoke **
-// Purpose:
-Allows for a joke to be added to the database
-// Parameters:
-$pdo: PDO object to interact with the database
-$joketext: The joke to be added to the database
-$authorId: The ID of the author who wrote the joke
+/* insert: Method to insert a record into a specified table
+$pdo: The PDO object to interact with the database
+$table: The table for insert to be carried out on
+$fields: The values to be inserted into the database
+return: none
 */
-/*
-function insertJoke($pdo, $joketext, $authorId)
-{
-    $query = 'INSERT INTO `joke` VALUES (:joketext, CURDATE(), :authorId)';
-    $parameters = [
-    ':joketext' => $joketext,
-    ':authorId' => $authorId];
-    query($pdo, $query, $parameters);
-}*/
-
 function insert($pdo, $table, $fields)
 {
     $query = 'INSERT INTO `' . $table . '` (';
 
+    // Dynamically generate fields that are being entered into the db
+    // e.g. ($id, $joketext, etc.)
     foreach ($fields as $key => $value)
     {
         $query .= '`' . $key . '`,';
     }
 
+    // Remove the trailing comma to mark the end of the 'INSERT' line
     $query = rtrim($query, ',');
 
+    // Begin next line of SQL query (VALUES ...)
     $query .= ') VALUES (';
 
+    // Dynamically generate placeholders for the values to be inserted
+    // e.g. VALUES (:id, :joketext, etc.)
     foreach ($fields as $key => $value)
     {
         $query .= ':' . $key . ',';
     }
 
+    // Remove the trailing comma to mark the end of the 'VALUES' line
     $query = rtrim($query, ',');
 
     $query .= ')';
@@ -113,88 +81,63 @@ function insert($pdo, $table, $fields)
 
     query($pdo, $query, $fields);
 }
-/* ** updateJoke **
-// Purpose:
-Allows for an existing joke to be updated
-// Parameters:
-$pdo: PDO object to interact with the database
-$jokeId: The ID of the joke to be edited
-$joketext: The new joke text to be added
-$authorId: The new joke author id to be added
-*/
-/*
-function updateJoke($pdo, $jokeId, $joketext, $authorId)
-{
-    $parameters = [
-        ':joketext' => $joketext,
-        ':authorId' => $authorId,
-        ':id' => $jokeId];
-    
-    query($pdo, 'UPDATE `joke` SET `authorId` = :authorId, `joketext` = :joketext WHERE `id` = :id', $parameters);
-}
-*/
 
-/*
-$pdo: PDO object to interact with the database
-$fields: An array containing the fields that will be updated
+/* update: Method to update a record in a specified table
+$pdo: The PDO object to interact with the database
+$table: The table for update to be carried out on
+$primaryKey: The PK identifier for specified table.
+$fields: The values to be updated in the selected record
+return: none
 */
 function update($pdo, $table, $primaryKey, $fields)
 {
     $query = 'UPDATE `' . $table . '` SET ';
 
+    /* Generate placeholders dynamically e.g: SET `id` = :id
+    This can be bound in the 'query' method */
     foreach($fields as $key => $value)
     {
         $query .= '`' . $key . '` = :'.$key . ',';
     }
 
+    // Remove the trailing comma to mark the end of the 'SET' line
     $query = rtrim($query, ',');
 
+    /* Adding 'WHERE' clause to correctly match the primary key identifier
+    to the record to be updated */
     $query .= ' WHERE `' . $primaryKey . '` = :primaryKey';
 
+    // Adding the 'primaryKey' value to the array
+    // 'id' is already used once, so a different key is needed for the same id value
     $fields['primaryKey'] = $fields['id'];
 
+    // Format any dates for presentation purposes
     $fields = processDates($fields);
 
     query($pdo, $query, $fields);
 }
 
-/* **deleteJoke**
-// Purpose:
-Allows for a joke from the database to be deleted based on its ID
-// Parameters:
-$pdo: PDO object to interact with the database
-$id: ID of the joke to be deleted
+/* delete: Method to delete a record from a specified table
+$pdo: The PDO object to interact with the database
+$table: The table for deletion to be carried out on
+$primaryKey: The PK identifier for specified table.
+$id: The value of the identifier for the record to be deleted
+return: none
 */
 function delete($pdo, $table, $primaryKey, $id)
 {
+    // Prepared statement parameters to bind
     $parameters = [':id' => $id];
     query($pdo, 'DELETE FROM `' .$table. '` WHERE `' .$primaryKey. '` = :id', $parameters);
 }
 
-/* **allJokes**
-// Purpose:
-Allows for all of the jokes in the database to be retrieved
-// Parameters:
-$pdo: PDO object to interact with the database
-*/
-function allJokes($pdo)
-{
-    $jokes = query($pdo, 'SELECT `joke`.`id`, `joketext`, `jokedate`, `name`, `email`
-    FROM `joke` INNER JOIN `author`
-    ON `authorid` = `author`.`id`');
-
-    return $jokes->fetchAll();
-}
-/* **query**
-// Purpose:
-Method to run an SQL query, given a PDO object and SQL query and optionally, an array
+/* query: Method to run an SQL query, given a PDO object and SQL query and optionally, an array
 of parameters. 
-// Parameters:
-$pdo: PDO object to interact with the database
+$pdo: The PDO object to interact with the database
 $sql: A string containing the SQL query to be executed
 $parameters[]: An array of all the parameters to be binded to the prepared SQL statement.
 // Default value for $parameters is [], for queries that have 0 parameters
-// If the function is passed in $pdo and $sql, $parameters will default to an empty array
+return: $query, PDOStatement upon success, false on failure
 */
 function query($pdo, $sql, $parameters = [])
 {
@@ -220,6 +163,14 @@ function query($pdo, $sql, $parameters = [])
     return $query;
 }
 
+/* save: Attempts to insert a record into a table, but if this record already exists,
+the update method is triggered instead. 
+$pdo: The PDO object to interact with the database
+$table: The table in the database to be queried
+$primaryKey: The primary key identifier of the specified table
+$record: The record to be inserted / updated
+return: none
+*/
 function save($pdo, $table, $primaryKey, $record)
 {
     try
@@ -238,5 +189,19 @@ function save($pdo, $table, $primaryKey, $record)
     {
         update($pdo, $table, $primaryKey, $record);
     }
+}
+
+// processDates: converts any dates to Y-m-d format for presentation
+function processDates($fields)
+{
+    foreach ($fields as $key => $value)
+    {
+        if ($value instanceof DateTime)
+        {
+            $fields[$key] = $value->format('Y-m-d');
+        }
+    }
+
+    return $fields;
 }
 ?>

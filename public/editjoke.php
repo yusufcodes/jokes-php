@@ -4,32 +4,18 @@ include __DIR__.'/../includes/DatabaseFunctions.php';
 
 try
 {
+    // Query the database as joke has been edited by user
     if (isset($_POST['joketext']))
     {
-        $joke = $_POST;
+        $joke = $_POST; // Extracting the ID (id) and Text (joketext) of the joke
         $joke['authorid'] = 1;
         $joke['jokedate'] = new DateTime();
         save($pdo, 'joke', 'id', $joke);
 
-        /*
-        save($pdo, 'joke', 'id', [
-            'id' => $_POST['jokeid'],
-            'joketext' => $_POST['joketext'],
-            'jokedate' => new DateTime(),
-            'authorId' => 1
-        ]);
-        */
-        /*
-        update($pdo, 'joke', 'id', [
-            'id' => $_POST['jokeid'],
-            'joketext' => $_POST['joketext'],
-            'authorId' => 1
-        ]);
-        */
-
         header('location: jokes.php');
     }
 
+    // Load page to allow for a joke to be edited
     else
     {
         if (isset($_GET['id']))
@@ -41,7 +27,6 @@ try
         ob_start();
         include __DIR__.'/../templates/editjoke.html.php';
         $output = ob_get_clean();
-        
     }
 }
 
@@ -50,9 +35,7 @@ catch (PDOException $e)
     $title = 'An error has occurred';
 
     $output = 'Database error: '.$e->getMessage().' in '.$e->getFile().':'.$e->getLine();
-
 }
 
 include __DIR__.'/../templates/layout.html.php';
-
 ?>
