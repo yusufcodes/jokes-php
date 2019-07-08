@@ -204,4 +204,3 @@ function processDates($fields)
 
     return $fields;
 }
-?>

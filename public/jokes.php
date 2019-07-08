@@ -28,7 +28,7 @@ try
     $title = 'Joke list';
 
     // Retrieving the total number of jokes submitted
-    $totalJokes = totalJokes($pdo);
+    $totalJokes = total($pdo, 'joke');
 
     // Output buffer: save contents into a buffer, doesn't get displayed in the browser straight away
     ob_start();
