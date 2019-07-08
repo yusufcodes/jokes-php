@@ -219,4 +219,24 @@ function query($pdo, $sql, $parameters = [])
 
     return $query;
 }
+
+function save($pdo, $table, $primaryKey, $record)
+{
+    try
+    {
+        // Check that the primary key is not empty
+        if ($record[$primaryKey] == '')
+        {
+            // SQL auto-increment triggered to replace an empty string
+            $record[$primaryKey] = null;
+        }
+
+        insert($pdo, $table, $record);
+    }
+
+    catch (PDOException $e)
+    {
+        update($pdo, $table, $primaryKey, $record);
+    }
+}
 ?>
