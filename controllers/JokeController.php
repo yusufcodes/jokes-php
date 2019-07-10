@@ -68,7 +68,7 @@ class JokeController
         $this->jokesTable->delete($_POST['id']);
 
         // redirect
-        header('location: jokes.php');
+        header('location: index.php?action=list');
     }
 
     public function edit()
@@ -80,9 +80,9 @@ class JokeController
             $joke['authorid'] = 1;
             $joke['jokedate'] = new DateTime();
 
-            $this->jokeTable->save($joke);
+            $this->jokesTable->save($joke);
 
-            header('location: jokes.php');
+            header('location: index.php?action=list');
         }
 
         // Load page to allow for a joke to be edited

@@ -12,7 +12,7 @@ try
 
     $action = $_GET['action'] ?? 'home';
 
-    $page = $jokeController->action();
+    $page = $jokeController->$action();
 
     $title = $page['title'];
     $output = $page['output'];
