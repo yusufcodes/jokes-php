@@ -1,16 +1,41 @@
 <?php
-// Setting the title of the homepage 
-$title = 'Internet Joke Database';
+try
+{
+    include __DIR__.'/../includes/DatabaseConnection.php';
+    include __DIR__.'/../classes/DatabaseTable.php';
+    include __DIR__.'/../controllers/JokeController.php';
 
-// Starting the buffer
-ob_start();
-// Storing the contents of the 'home' template into the $output variable, which is accessed
-// in the 'layout' template
+    $jokesTable = new DatabaseTable($pdo, 'joke', 'id');
+    $authorsTable = new DatabaseTable($pdo, 'author', 'id');
 
-include __DIR__.'/../templates/home.html.php';
+    $jokeController = new JokeController($jokesTable, $authorsTable);
 
-// Dumping the buffer contents into $output
-$output = ob_get_clean();
+    if (isset($_GET['edit']))
+    {
+        $page = $jokeController->edit();
+    }
+    elseif (isset($_GET['delete']))
+    {
+        $page = $jokeController->delete();
+    }
+    elseif (isset($_GET['list']))
+    {
+        $page = $jokeController->list();
+    }
+    else
+    {
+        $page = $jokeController->home();
+    }
+
+    $title = $page['title'];
+    $output = $page['output'];
+}
+
+catch (PDOException $e)
+{
+    $title = 'An error has occurred';
+
+    $output = 'Database error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
+}
 
 include __DIR__.'/../templates/layout.html.php';
-?>
