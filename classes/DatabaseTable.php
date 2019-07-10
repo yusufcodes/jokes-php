@@ -19,7 +19,7 @@ class DatabaseTable
     */
     public function total()
     {
-        $query = $this->query($this->pdo, 'SELECT COUNT(*) FROM `'.$this->table.'`');
+        $query = $this->query('SELECT COUNT(*) FROM `'.$this->table.'`');
         $row = $query->fetch();
         return $row[0];
     }
@@ -28,9 +28,9 @@ class DatabaseTable
     $pdo: The PDO object to interact with the database
     $table: The table of which all records are to be selected from
     */
-    public function findAll($pdo, $table)
+    public function findAll()
     {
-        $result = $this->query($pdo, 'SELECT * FROM `' . $table . '`');
+        $result = $this->query('SELECT * FROM `' . $this->table . '`');
         return $result->fetchAll();
     }
 
@@ -151,9 +151,9 @@ class DatabaseTable
     // Default value for $parameters is [], for queries that have 0 parameters
     return: $query, PDOStatement upon success, false on failure
     */
-    private function query($pdo, $sql, $parameters = [])
+    private function query($sql, $parameters = [])
     {
-        $query = $pdo->prepare($sql);
+        $query = $this->pdo->prepare($sql);
 
         /* Before: */
         /* Uses the $name and $value pair, to pass into the bindValue function,
