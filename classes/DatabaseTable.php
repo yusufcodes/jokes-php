@@ -2,19 +2,24 @@
 
 class DatabaseTable
 { 
-    public $pdo;
-    public $table;
-    public $primaryKey;
+    private $pdo; // Database connection
+    private $table; // Table to be queried by this instance of the class
+    private $primaryKey; // The primary key identifier for specified table
 
-    // DatabaseFunctions.php: Functions created to query the ijdb database
+    public function __construct(PDO $pdo, string $table, string $primaryKey)
+    {
+        $this->pdo = $pdo;
+        $this->table = $table;
+        $this->primaryKey = $primaryKey;
+    }
 
     /* total: Retrieve the total number of records from a database
     $pdo: The PDO object to interact with the database
     $table: The table of which total number of records are to be selected from
     */
-    public function total($pdo, $table)
+    public function total()
     {
-        $query = $this->query($pdo, 'SELECT COUNT(*) FROM `'.$table.'`');
+        $query = $this->query($this->pdo, 'SELECT COUNT(*) FROM `'.$this->table.'`');
         $row = $query->fetch();
         return $row[0];
     }
@@ -36,15 +41,15 @@ class DatabaseTable
     $value: The ID to be selected from the db
     return: none
     */
-    public function findById($pdo, $table, $primaryKey, $value)
+    public function findById($value)
     {
-        $query = 'SELECT * FROM `' . $table . '` WHERE `' . $primaryKey .'` =  :value';
+        $query = 'SELECT * FROM `' . $this->table . '` WHERE `' . $this->primaryKey .'` =  :value';
 
         $parameters = [
             'value' => $value
         ];
 
-        $query = $this->query($pdo, $query, $parameters);
+        $query = $this->query($query, $parameters);
 
         return $query->fetch();
     }
@@ -55,9 +60,9 @@ class DatabaseTable
     $fields: The values to be inserted into the database
     return: none
     */
-    private function insert($pdo, $table, $fields)
+    private function insert($fields)
     {
-        $query = 'INSERT INTO `' . $table . '` (';
+        $query = 'INSERT INTO `' . $this->table . '` (';
 
         // Dynamically generate fields that are being entered into the db
         // e.g. ($id, $joketext, etc.)
@@ -86,7 +91,7 @@ class DatabaseTable
 
         $fields = $this->processDates($fields);
 
-        $this->query($pdo, $query, $fields);
+        $this->query($query, $fields);
     }
 
     /* update: Method to update a record in a specified table
@@ -96,9 +101,9 @@ class DatabaseTable
     $fields: The values to be updated in the selected record
     return: none
     */
-    private function update($pdo, $table, $primaryKey, $fields)
+    private function update($fields)
     {
-        $query = 'UPDATE `' . $table . '` SET ';
+        $query = 'UPDATE `' . $this->table . '` SET ';
 
         /* Generate placeholders dynamically e.g: SET `id` = :id
         This can be bound in the 'query' method */
@@ -112,7 +117,7 @@ class DatabaseTable
 
         /* Adding 'WHERE' clause to correctly match the primary key identifier
         to the record to be updated */
-        $query .= ' WHERE `' . $primaryKey . '` = :primaryKey';
+        $query .= ' WHERE `' . $this->primaryKey . '` = :primaryKey';
 
         // Adding the 'primaryKey' value to the array
         // 'id' is already used once, so a different key is needed for the same id value
@@ -121,7 +126,7 @@ class DatabaseTable
         // Format any dates for presentation purposes
         $fields = $this->processDates($fields);
 
-        $this->query($pdo, $query, $fields);
+        $this->query($query, $fields);
     }
 
     /* delete: Method to delete a record from a specified table
@@ -131,11 +136,11 @@ class DatabaseTable
     $id: The value of the identifier for the record to be deleted
     return: none
     */
-    public function delete($pdo, $table, $primaryKey, $id)
+    public function delete($id)
     {
         // Prepared statement parameters to bind
         $parameters = [':id' => $id];
-        $this->query($pdo, 'DELETE FROM `' .$table. '` WHERE `' .$primaryKey. '` = :id', $parameters);
+        $this->query('DELETE FROM `' .$this->table. '` WHERE `' .$this->primaryKey. '` = :id', $parameters);
     }
 
     /* query: Method to run an SQL query, given a PDO object and SQL query and optionally, an array
@@ -178,23 +183,23 @@ class DatabaseTable
     $record: The record to be inserted / updated
     return: none
     */
-    public function save($pdo, $table, $primaryKey, $record)
+    public function save($record)
     {
         try
         {
             // Check that the primary key is not empty
-            if ($record[$primaryKey] == '')
+            if ($record[$this->primaryKey] == '')
             {
                 // SQL auto-increment triggered to replace an empty string
-                $record[$primaryKey] = null;
+                $record[$this->primaryKey] = null;
             }
 
-            $this->insert($pdo, $table, $record);
+            $this->insert($record);
         }
 
         catch (PDOException $e)
         {
-            $this->update($pdo, $table, $primaryKey, $record);
+            $this->update($record);
         }
     }
 
