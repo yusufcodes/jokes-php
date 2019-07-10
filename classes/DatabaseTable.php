@@ -12,7 +12,7 @@ class DatabaseTable
     $pdo: The PDO object to interact with the database
     $table: The table of which total number of records are to be selected from
     */
-    function total($pdo, $table)
+    public function total($pdo, $table)
     {
         $query = $this->query($pdo, 'SELECT COUNT(*) FROM `'.$table.'`');
         $row = $query->fetch();
@@ -23,7 +23,7 @@ class DatabaseTable
     $pdo: The PDO object to interact with the database
     $table: The table of which all records are to be selected from
     */
-    function findAll($pdo, $table)
+    public function findAll($pdo, $table)
     {
         $result = $this->query($pdo, 'SELECT * FROM `' . $table . '`');
         return $result->fetchAll();
@@ -36,7 +36,7 @@ class DatabaseTable
     $value: The ID to be selected from the db
     return: none
     */
-    function findById($pdo, $table, $primaryKey, $value)
+    public function findById($pdo, $table, $primaryKey, $value)
     {
         $query = 'SELECT * FROM `' . $table . '` WHERE `' . $primaryKey .'` =  :value';
 
@@ -55,7 +55,7 @@ class DatabaseTable
     $fields: The values to be inserted into the database
     return: none
     */
-    function insert($pdo, $table, $fields)
+    private function insert($pdo, $table, $fields)
     {
         $query = 'INSERT INTO `' . $table . '` (';
 
@@ -84,9 +84,9 @@ class DatabaseTable
 
         $query .= ')';
 
-        $fields = processDates($fields);
+        $fields = $this->processDates($fields);
 
-        query($pdo, $query, $fields);
+        $this->query($pdo, $query, $fields);
     }
 
     /* update: Method to update a record in a specified table
@@ -96,7 +96,7 @@ class DatabaseTable
     $fields: The values to be updated in the selected record
     return: none
     */
-    function update($pdo, $table, $primaryKey, $fields)
+    private function update($pdo, $table, $primaryKey, $fields)
     {
         $query = 'UPDATE `' . $table . '` SET ';
 
@@ -121,7 +121,7 @@ class DatabaseTable
         // Format any dates for presentation purposes
         $fields = $this->processDates($fields);
 
-        query($pdo, $query, $fields);
+        $this->query($pdo, $query, $fields);
     }
 
     /* delete: Method to delete a record from a specified table
@@ -131,7 +131,7 @@ class DatabaseTable
     $id: The value of the identifier for the record to be deleted
     return: none
     */
-    function delete($pdo, $table, $primaryKey, $id)
+    public function delete($pdo, $table, $primaryKey, $id)
     {
         // Prepared statement parameters to bind
         $parameters = [':id' => $id];
@@ -146,7 +146,7 @@ class DatabaseTable
     // Default value for $parameters is [], for queries that have 0 parameters
     return: $query, PDOStatement upon success, false on failure
     */
-    function query($pdo, $sql, $parameters = [])
+    private function query($pdo, $sql, $parameters = [])
     {
         $query = $pdo->prepare($sql);
 
@@ -178,7 +178,7 @@ class DatabaseTable
     $record: The record to be inserted / updated
     return: none
     */
-    function save($pdo, $table, $primaryKey, $record)
+    public function save($pdo, $table, $primaryKey, $record)
     {
         try
         {
@@ -199,7 +199,7 @@ class DatabaseTable
     }
 
     // processDates: converts any dates to Y-m-d format for presentation
-    function processDates($fields)
+    private function processDates($fields)
     {
         foreach ($fields as $key => $value)
         {
