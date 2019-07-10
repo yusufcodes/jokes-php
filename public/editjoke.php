@@ -1,16 +1,19 @@
 <?php
 include __DIR__.'/../includes/DatabaseConnection.php';
-include __DIR__.'/../includes/DatabaseFunctions.php';
+include __DIR__.'/../classes/DatabaseTable.php';
 
 try
 {
+    $jokesTable = new DatabaseTable($pdo, 'joke', 'id');
+
     // Query the database as joke has been edited by user
     if (isset($_POST['joketext']))
     {
         $joke = $_POST; // Extracting the ID (id) and Text (joketext) of the joke
         $joke['authorid'] = 1;
         $joke['jokedate'] = new DateTime();
-        save($pdo, 'joke', 'id', $joke);
+
+        $jokeTable->save($joke);
 
         header('location: jokes.php');
     }
@@ -20,7 +23,7 @@ try
     {
         if (isset($_GET['id']))
         {
-            $joke = findById($pdo, 'joke', 'id', $_GET['id']);
+            $joke = $jokesTable->findById($_GET['id']);
         }
 
         $title = 'Edit joke';

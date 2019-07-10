@@ -2,17 +2,19 @@
 try
 {
     include_once __DIR__.'/../includes/DatabaseConnection.php';
-    include_once __DIR__.'/../includes/DatabaseFunctions.php';
+    include_once __DIR__.'/../classes/DatabaseTable.php';
 
-    // Retrieving all records from the 'joke' table
-    $result = findAll($pdo, 'joke');
+    $jokesTable = new DatabaseTable($pdo, 'joke', 'id');
+    $authorsTable = new DatabaseTable($pdo, 'author', 'id');
+
+    $result = $jokesTable->findAll();
 
     $jokes = [];
 
     foreach($result as $joke)
     {
         // Retrieving author details for each joke
-        $author = findById($pdo, 'author', 'id', $joke['authorid']);
+        $author = $authorsTable->findById($joke['authorid']);
 
         // Creating a record of Joke ID, Joke Text, Joke Date, Author Name and Email
         $jokes[] = [
@@ -28,7 +30,7 @@ try
     $title = 'Joke list';
 
     // Retrieving the total number of jokes submitted
-    $totalJokes = total($pdo, 'joke');
+    $totalJokes = $jokesTable->total();
 
     // Output buffer: save contents into a buffer, doesn't get displayed in the browser straight away
     ob_start();

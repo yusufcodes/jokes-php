@@ -1,10 +1,12 @@
 <?php
 try {
     include __DIR__.'/../includes/DatabaseConnection.php';
-    include __DIR__.'/../includes/DatabaseFunctions.php';
+    include __DIR__.'/../classes/DatabaseTable.php';
+
+    $jokesTable = new DatabaseTable($pdo, 'joke', 'id');
 
     // Execute the delete method with the ID retrieved from the form submitted
-    delete($pdo, 'joke', 'id', $_POST['id']);
+    $jokesTable->delete($_POST['id']);
 
     // redirect
     header('location: jokes.php');
