@@ -1,4 +1,13 @@
 <?php
+function loadTemplate($templateFileName, $variables = [])
+{
+    extract($variables);
+
+    ob_start();
+    include __DIR__.'/../templates/' . $templateFileName;
+    return ob_get_clean();
+}
+
 try
 {
     include __DIR__.'/../includes/DatabaseConnection.php';
@@ -15,7 +24,16 @@ try
     $page = $jokeController->$action();
 
     $title = $page['title'];
-    $output = $page['output'];
+
+    if (isset($page['variables']))
+    {
+        $output = loadTemplate($page['template'], $page['variables']);
+    }
+
+    else
+    {
+        $output = loadTemplate($page['template']);
+    }
 }
 
 catch (PDOException $e)
